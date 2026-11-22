@@ -98,6 +98,22 @@ def test_one_of_reaches_every_variant():
     assert 'Box --> "0..1 pay" Card' in text and 'Box --> "0..1 pay" Cash' in text
 
 
+def test_a_subtype_does_not_inherit_the_one_of_that_lists_it():
+    # springdoc's discriminated polymorphism: the parent lists its subtypes in `oneOf`, and
+    # each subtype extends the parent through `allOf`. Folding the parent's `oneOf` into the
+    # subtype made the subtype one of itself, and `reach` recursed until Python stopped it.
+    answer = {"type": "object", "required": ["type"],
+              "discriminator": {"propertyName": "type",
+                                "mapping": {"TEXT": "#/components/schemas/Text"}},
+              "oneOf": [ref("Text")], "properties": {"type": {"type": "string"}}}
+    text_answer = {"allOf": [ref("Answer"), {"type": "object", "required": ["text"],
+                                             "properties": {"text": {"type": "string"}}}]}
+    text = puml({"Attempt": {"type": "object", "properties": {"answer": ref("Answer")}},
+                 "Answer": answer, "Text": text_answer}, ref("Attempt"))
+    assert 'Attempt --> "0..1 answer" Text' in text
+    assert "class Text {" in text and "type* : string" in text and "text* : string" in text
+
+
 def test_an_inline_object_is_named_after_its_field():
     text = puml({"Pet": {"type": "object", "properties": {"chip": {
         "type": "object", "properties": {"code": {"type": "string"}}}}}}, ref("Pet"))
