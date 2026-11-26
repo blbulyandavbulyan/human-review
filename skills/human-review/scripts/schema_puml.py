@@ -136,10 +136,17 @@ class Model:
                 name = name or sub_name
             props.update(sub.get("properties") or {})
             required += sub.get("required") or []
-            for key in ("type", "format", "enum", "items", "additionalProperties",
-                        "oneOf", "anyOf"):
+            for key in ("type", "format", "enum", "items", "additionalProperties"):
                 if key in sub:
                     merged.setdefault(key, sub[key])
+            for key in ("oneOf", "anyOf"):
+                # A discriminated parent lists its subtypes, and each subtype extends it
+                # through `allOf`: the subtype is one of those variants, never a choice
+                # between them. Inheriting the list whole made it one of itself.
+                variants = [v for v in sub.get(key) or []
+                            if not (name and self.follow(v)[1] == name)]
+                if variants and key not in merged:
+                    merged[key] = variants
         props.update(s.get("properties") or {})
         required += s.get("required") or []
         return {**merged, "properties": props, "required": required}, name
