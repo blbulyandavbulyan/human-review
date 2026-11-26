@@ -87,6 +87,17 @@ def test_stroke_and_background_are_rewritten_inside_style_but_not_other_props():
     assert 'width:10px;height:10px' in out    # untouched — not a colour
 
 
+def test_the_pre_2022_plantuml_skin_is_themed_too():
+    """Older PlantUML jars still draw the old default skin: yellow `#FEFECE` class boxes,
+    crimson `#A80036` borders, and `stroke: #…` written with a space. The black label was
+    themed to near-white while the box stayed yellow, so every class name vanished."""
+    svg = ('<rect fill="#FEFECE" style="stroke: #A80036; stroke-width: 1.5;"/>'
+           '<text fill="#000000">Phrase</text>')
+    out = build._theme_diagram_colors(svg)
+    assert out == ('<rect fill="var(--dgm-box)" style="stroke:var(--dgm-line); '
+                   'stroke-width: 1.5;"/><text fill="var(--dgm-fg)">Phrase</text>')
+
+
 def test_added_and_removed_get_their_own_distinct_variables():
     """Both differs paint an addition green and a removal red — one palette across the
     structural delta and the sequence delta, so a reader flipping between them is not

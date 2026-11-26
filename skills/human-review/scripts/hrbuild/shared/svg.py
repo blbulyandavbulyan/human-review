@@ -111,6 +111,9 @@ DIAGRAM_COLOR_VARS = {
     "#DDDDDD": "--dgm-legend", "#181818": "--dgm-line", "#000000": "--dgm-fg",
     "#ADD1B2": "--dgm-icon", "#E2E2F0": "--dgm-activation", "#888888": "--dgm-muted",
     "#1A4FA0": "--dgm-link",
+    # PlantUML before 1.2022's default skin: yellow class boxes, crimson borders. Older
+    # jars still draw it, and its #000000 labels follow --dgm-fg into near-white.
+    "#FEFECE": "--dgm-box", "#A80036": "--dgm-line",
     # The two differs' shared palette — puml_diff.ADDED / .REMOVED and the sequence
     # differ's lifeline and note tints. Kept in step with those constants by
     # test_diagram_dark_mode.py rather than by memory.
@@ -133,7 +136,7 @@ DIAGRAM_COLOR_VARS = {
 # both spellings are matched and the short one is widened before the lookup. Missing
 # them left every activation bar and `tx` group header a white slab on a dark page.
 DIAGRAM_FILL_ATTR = re.compile(r'\b(fill|flood-color)="(#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3}))"')
-DIAGRAM_STYLE_COLOR = re.compile(r'\b(stroke|background):(#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3}))\b')
+DIAGRAM_STYLE_COLOR = re.compile(r'\b(stroke|background):\s*(#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{3}))\b')
 
 # PlantUML measures every label with the font *it* had at render time and writes the
 # result into the SVG as `textLength`, with `lengthAdjust="spacing"` telling the browser
